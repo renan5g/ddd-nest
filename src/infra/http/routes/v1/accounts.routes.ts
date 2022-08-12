@@ -1,7 +1,13 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
+import { ProfileM } from '@infra/docs/models';
 import { CurrentUser } from '@infra/http/decorators';
 import { JWTAuthGuard } from '@infra/http/guards';
 import { CreateUserDTO } from '@modules/accounts/dtos';
@@ -12,6 +18,8 @@ import {
 import { AuthUserDTO } from '@modules/auth/dtos';
 
 @ApiTags('Accounts')
+@ApiBearerAuth()
+@ApiExtraModels(ProfileM)
 @UseGuards(JWTAuthGuard)
 @Controller({
   path: 'accounts',
@@ -30,6 +38,7 @@ export class AccountsRoutes {
   }
 
   @Get('me')
+  @ApiOkResponse({ type: ProfileM })
   async profile(@CurrentUser() user: AuthUserDTO, @Res() res: Response) {
     const httpResponse = await this.getProfileController.handle(user);
     return res.status(httpResponse.statusCode).json(httpResponse.body);

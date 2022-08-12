@@ -35,6 +35,7 @@ export class GetProfileController implements Controller {
           // accessToken: data.accessToken,
           lastLogin: data.lastLogin,
           isDeleted: data.isDeleted,
+          deletedAt: data.deletedAt,
           createdAt: data.createdAt,
           updatedAt: data.updatedAt,
         };

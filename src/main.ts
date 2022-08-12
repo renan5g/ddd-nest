@@ -26,9 +26,10 @@ async function bootstrap() {
     .setTitle('Documentação do sistema QrCard')
     .setDescription('Api validador do sistema QrCard')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(`${APP_ROUTE_PREFIX}/:version/docs`, app, document);
+  SwaggerModule.setup(`docs`, app, document);
 
   app.use('docs', express.static(process.cwd() + 'docs'));
   app.useStaticAssets(join(__dirname, '..', 'tmp'));
