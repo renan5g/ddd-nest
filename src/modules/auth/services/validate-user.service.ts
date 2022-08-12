@@ -1,11 +1,20 @@
+import { Inject, Injectable } from '@nestjs/common';
+
 import { Either, left, Result, right } from '@core/logic';
-import { User } from '@modules/accounts/domain/user';
-import { IUsersRepository } from '@modules/accounts/repositories/models';
+import { TOKENS } from '@shared/constants';
 import { Password } from '@shared/domain/value-objects';
 import { ErrorMessages } from '@shared/errors';
 
+import { User } from '@modules/accounts/domain/user';
+import { IUsersRepository } from '@modules/accounts/repositories/models';
+import { UserNotFoundError } from './errors/user-not-found.error';
+
+@Injectable()
 export class ValidateUser {
-  constructor(private usersRepository: IUsersRepository) {}
+  constructor(
+    @Inject(TOKENS.USERS_REPOSITORY)
+    private usersRepository: IUsersRepository,
+  ) {}
 
   async execute({
     password,
@@ -17,9 +26,7 @@ export class ValidateUser {
     });
 
     if (!user) {
-      return left(
-        Result.fail<User>(new Error(ErrorMessages.USER_DOES_NOT_EXIST)),
-      );
+      return left(new UserNotFoundError());
     }
 
     const isValidPassword = await user.password.comparePassword(password);
@@ -40,5 +47,5 @@ export namespace ValidateUser {
     password: string;
   };
 
-  export type Output = Either<Result<any>, User>;
+  export type Output = Either<Result<any> | UserNotFoundError, User>;
 }

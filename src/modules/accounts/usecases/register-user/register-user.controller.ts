@@ -1,14 +1,19 @@
+import { Injectable } from '@nestjs/common';
+
 import {
   clientError,
+  conflict,
   Controller,
+  created,
   fail,
   HttpResponse,
-  notFound,
-  ok,
 } from '@core/infra';
-import { UserNotFoundError } from './errors';
+
+import { CreateUserDTO } from '@modules/accounts/dtos';
+import { UserAlreadyExistsError } from './errors';
 import { RegisterUser } from './register-user.service';
 
+@Injectable()
 export class RegisterUserController implements Controller {
   constructor(private registerUser: RegisterUser) {}
 
@@ -16,7 +21,7 @@ export class RegisterUserController implements Controller {
     email,
     password,
     username,
-  }: RegisterUserController.Request): Promise<HttpResponse> {
+  }: CreateUserDTO): Promise<HttpResponse> {
     try {
       const result = await this.registerUser.execute({
         email,
@@ -28,24 +33,16 @@ export class RegisterUserController implements Controller {
         const error = result.value;
 
         switch (error.constructor) {
-          case UserNotFoundError:
-            return notFound(error.errorValue());
+          case UserAlreadyExistsError:
+            return conflict(error.errorValue());
           default:
             return clientError(error.errorValue());
         }
       } else {
-        return ok();
+        return created();
       }
     } catch (err) {
       return fail(err);
     }
   }
-}
-
-export namespace RegisterUserController {
-  export type Request = {
-    email: string;
-    username: string;
-    password: string;
-  };
 }

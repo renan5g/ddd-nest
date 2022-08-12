@@ -1,15 +1,22 @@
+import { Inject, Injectable } from '@nestjs/common';
+
 import { UseCase } from '@core/domain';
 import { Either, left, Result, right } from '@core/logic';
+import { TOKENS } from '@shared/constants';
 import { Email, Name, Password } from '@shared/domain/value-objects';
 
 import { User } from '@modules/accounts/domain/user';
 import { IUsersRepository } from '@modules/accounts/repositories/models';
-import { UserNotFoundError } from './errors';
+import { UserAlreadyExistsError } from './errors';
 
+@Injectable()
 export class RegisterUser
   implements UseCase<RegisterUser.Input, RegisterUser.Output>
 {
-  constructor(private readonly usersRepo: IUsersRepository) {}
+  constructor(
+    @Inject(TOKENS.USERS_REPOSITORY)
+    private readonly usersRepo: IUsersRepository,
+  ) {}
 
   async execute({
     email,
@@ -36,7 +43,7 @@ export class RegisterUser
     });
 
     if (userAlreadyExists) {
-      return left(new UserNotFoundError());
+      return left(new UserAlreadyExistsError());
     }
 
     const userOrError = User.create({
@@ -51,7 +58,7 @@ export class RegisterUser
 
     const user = userOrError.getValue();
 
-    await this.usersRepo.save(user);
+    await this.usersRepo.create(user);
 
     return right(Result.ok<void>());
   }
@@ -64,5 +71,8 @@ export namespace RegisterUser {
     password: string;
   };
 
-  export type Output = Either<Result<any> | UserNotFoundError, Result<void>>;
+  export type Output = Either<
+    Result<any> | UserAlreadyExistsError,
+    Result<void>
+  >;
 }

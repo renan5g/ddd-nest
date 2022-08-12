@@ -7,7 +7,9 @@ import {
   FindByEmailOrUsernameParams,
   IUsersRepository,
 } from '@modules/accounts/repositories/models';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PrismaUsersRepository implements IUsersRepository {
   constructor(private readonly prismaService: PrismaService) {}
 

@@ -44,8 +44,6 @@ export class Password extends ValueObject<PasswordProps> {
     if (this.props.hashed) {
       hashed = this.props.value;
 
-      console.log(hashed);
-
       return await bcrypt.compare(plainTextPassword, hashed);
     }
 

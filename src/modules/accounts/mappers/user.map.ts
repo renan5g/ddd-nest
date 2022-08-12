@@ -12,17 +12,20 @@ export class UserMap {
       hashed: true,
     });
 
-    const entityOrError = User.create({
-      username: username.getValue(),
-      email: email.getValue(),
-      password: password.getValue(),
-      accessToken: raw.access_token,
-      isDeleted: raw.is_deleted,
-      lastLogin: raw.last_login,
-      createdAt: raw.created_at,
-      updatedAt: raw.updated_at,
-      deletedAt: raw.deleted_at,
-    });
+    const entityOrError = User.create(
+      {
+        username: username.getValue(),
+        email: email.getValue(),
+        password: password.getValue(),
+        accessToken: raw.access_token,
+        isDeleted: raw.is_deleted,
+        lastLogin: raw.last_login,
+        createdAt: raw.created_at,
+        updatedAt: raw.updated_at,
+        deletedAt: raw.deleted_at,
+      },
+      raw.id,
+    );
 
     if (entityOrError.isFailure) {
       console.log(entityOrError.error);
