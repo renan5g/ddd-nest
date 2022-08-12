@@ -25,7 +25,9 @@ export class PrismaUsersRepository implements IUsersRepository {
 
   async findById(id: string): Promise<User> {
     const user = await this.prismaService.user.findUnique({
-      where: { id },
+      where: {
+        id,
+      },
     });
 
     if (!user) return null;
@@ -43,7 +45,7 @@ export class PrismaUsersRepository implements IUsersRepository {
       },
     });
 
-    if (!user) return null;
+    if (!user || user.is_deleted) return null;
 
     return UserMap.toDomain(user);
   }
