@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: database_auth
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=auth-db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - qrcard-api-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=true
+    networks:
+      - qrcard-api-net
+
+
+networks:
+  qrcard-api-net:
+    driver: bridge
+volumes:
+  postgres:
+    name: auth-db
