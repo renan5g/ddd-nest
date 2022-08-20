@@ -5,6 +5,7 @@ import { Either, left, Result, right } from '@core/logic';
 import { TOKENS } from '@shared/constants';
 import { Email, Name, Password } from '@shared/domain/value-objects';
 
+import { IStorageProvider } from '@infra/providers/storage/models';
 import { User } from '@modules/accounts/domain/user';
 import { IUsersRepository } from '@modules/accounts/repositories/models';
 import { UserAlreadyExistsError } from './errors';
@@ -16,6 +17,8 @@ export class RegisterUser
   constructor(
     @Inject(TOKENS.USERS_REPOSITORY)
     private readonly usersRepo: IUsersRepository,
+    @Inject(TOKENS.STORAGE_PROVIDER)
+    private readonly storageProvider: IStorageProvider,
   ) {}
 
   async execute({

@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDTO {
+export class CreateUserInput {
   @IsEmail()
   @ApiProperty({
     example: 'example@mail.com',

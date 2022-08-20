@@ -8,12 +8,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { LoginDTO, TokenM } from '@infra/docs/models';
+import { LoginInput, TokenM } from '@infra/docs/models';
 import { LocalAuthGuard } from '@infra/http/guards';
 import { AuthenticateUserController } from '@modules/auth/usecases';
 
 @ApiTags('Auth')
-@ApiExtraModels(LoginDTO, TokenM)
+@ApiExtraModels(LoginInput, TokenM)
 @Controller({
   path: 'auth',
   version: '1',
@@ -24,7 +24,7 @@ export class AuthRoutes {
   ) {}
 
   @UseGuards(LocalAuthGuard)
-  @ApiBody({ type: LoginDTO })
+  @ApiBody({ type: LoginInput })
   @ApiOkResponse({ type: TokenM })
   @Post('/admin_session/new')
   async login(@Req() req: Request, @Res() res: Response) {

@@ -8,18 +8,133 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
+  id           String  @id @default(uuid())
   username     String
-  email        String    @unique
+  email        String  @unique
   password     String
   avatar       String?
   access_token String?
-  last_login   DateTime?
-  is_deleted   Boolean   @default(false)
 
+  is_deleted Boolean   @default(false)
+  last_login DateTime?
   deleted_at DateTime?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now()) @updatedAt
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@map("users")
+}
+
+enum MangaStatus {
+  COMPLETED
+  HIATO
+  ACTIVE
+  CANCELLED
+}
+
+enum MangaFormat {
+  MANGA
+  MANHUA
+  MANHWA
+  NOVEL
+  SPINOFF
+}
+
+enum MangaDemography {
+  SHOUNNEN
+  SHOUJO
+  SEINEN
+  JOSEI
+}
+
+model Manga {
+  id                 String          @id
+  title              String          @unique
+  slug               String          @unique
+  alternative_titles String[]
+  genres             String[]
+  synopsis           String
+  author             String?
+  artist             String?
+  status             MangaStatus
+  format             MangaFormat
+  demography         MangaDemography
+  poster             String?
+  cover              String?
+  chapters_count     Int?
+  last_published_at  DateTime?
+  chapters           Chapter[]
+  scans              ScanManga[]
+
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  @@map("mangas")
+}
+
+model Chapter {
+  id               String        @id
+  chapter_number   String        @unique
+  cover            String?
+  title            String?
+  link             String?
+  date_time_posted DateTime?
+  pages_count      Int?
+  pages            ChapterPage[]
+  manga            Manga         @relation(fields: [manga_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  manga_id         String
+  scan             Scan          @relation(fields: [scan_id], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  scan_id          String
+
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  @@map("chapters")
+}
+
+model ChapterPage {
+  id          String  @id
+  page_number Int
+  page_url    String?
+  chapter     Chapter @relation(fields: [chapter_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chapter_id  String
+
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  @@map("chapters_pages")
+}
+
+model Scan {
+  id          String      @id
+  name        String      @unique
+  email       String      @unique
+  password    String
+  url         String?
+  cover       String?
+  description String?
+  website     String?
+  discord     String?
+  facebook    String?
+  chapters    Chapter[]
+  mangas      ScanManga[]
+
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  @@map("scans")
+}
+
+model ScanManga {
+  id       String @id
+  manga    Manga  @relation(fields: [manga_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  scan     Scan   @relation(fields: [scan_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  manga_id String
+  scan_id  String
+
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  @@unique([manga_id, scan_id])
+  @@map("scan_mangas")
 }

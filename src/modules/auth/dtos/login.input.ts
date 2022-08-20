@@ -20,8 +20,3 @@ export class LoginInput {
   })
   password: string;
 }
-
-export class TokenM {
-  @ApiProperty()
-  accessToken: string;
-}

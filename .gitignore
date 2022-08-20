@@ -36,3 +36,9 @@ lerna-debug.log*
 
 # Tmp
 /tmp/*
+
+# Production
+.env
+
+# local env files
+.env*.local

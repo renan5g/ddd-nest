@@ -10,7 +10,7 @@ import { Response } from 'express';
 import { ProfileM } from '@infra/docs/models';
 import { CurrentUser } from '@infra/http/decorators';
 import { JWTAuthGuard } from '@infra/http/guards';
-import { CreateUserDTO } from '@modules/accounts/dtos';
+import { CreateUserInput } from '@modules/accounts/dtos';
 import {
   GetProfileController,
   RegisterUserController,
@@ -32,7 +32,7 @@ export class AccountsRoutes {
   ) {}
 
   @Post('admin/new')
-  async register(@Body() data: CreateUserDTO, @Res() res: Response) {
+  async register(@Body() data: CreateUserInput, @Res() res: Response) {
     const httpResponse = await this.registerUserController.handle(data);
     return res.status(httpResponse.statusCode).json(httpResponse.body);
   }

@@ -9,7 +9,7 @@ import {
   HttpResponse,
 } from '@core/infra';
 
-import { CreateUserDTO } from '@modules/accounts/dtos';
+import { CreateUserInput } from '@modules/accounts/dtos';
 import { UserAlreadyExistsError } from './errors';
 import { RegisterUser } from './register-user.service';
 
@@ -21,7 +21,7 @@ export class RegisterUserController implements Controller {
     email,
     password,
     username,
-  }: CreateUserDTO): Promise<HttpResponse> {
+  }: CreateUserInput): Promise<HttpResponse> {
     try {
       const result = await this.registerUser.execute({
         email,

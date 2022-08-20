@@ -2,7 +2,7 @@ version: '3.9'
 services:
   postgres:
     image: postgres:latest
-    container_name: database_auth
+    container_name: database_qrcard_api
     restart: always
     ports:
       - 5432:5432
@@ -15,14 +15,14 @@ services:
     networks:
       - qrcard-api-net
 
-  redis:
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    environment:
-      - ALLOW_EMPTY_PASSWORD=true
-    networks:
-      - qrcard-api-net
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - 6379:6379
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=true
+  #   networks:
+  #     - qrcard-api-net
 
 
 networks:
