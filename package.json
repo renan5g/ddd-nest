@@ -13,6 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "adm-zip": "^0.5.9",
     "aws-sdk": "^2.1198.0",
     "bcrypt": "^5.0.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "ioredis": "^5.2.2",
     "passport": "^0.6.0",
@@ -37,6 +39,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "sharp": "^0.30.7",
+    "slugify": "^1.6.5",
     "validator": "^13.7.0"
   },
   "devDependencies": {

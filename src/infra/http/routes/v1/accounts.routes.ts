@@ -8,8 +8,8 @@ import {
 import { Response } from 'express';
 
 import { ProfileM } from '@infra/docs/models';
-import { CurrentUser } from '@infra/http/decorators';
-import { JWTAuthGuard } from '@infra/http/guards';
+import { CurrentUser, Public } from '@infra/http/decorators';
+import { UserAuthGuard } from '@infra/http/guards';
 import { CreateUserInput } from '@modules/accounts/dtos';
 import {
   GetProfileController,
@@ -19,28 +19,35 @@ import { AuthUserDTO } from '@modules/auth/dtos';
 
 @ApiTags('Accounts')
 @ApiBearerAuth()
+@UseGuards(UserAuthGuard)
 @ApiExtraModels(ProfileM)
-@UseGuards(JWTAuthGuard)
 @Controller({
   path: 'accounts',
   version: '1',
 })
 export class AccountsRoutes {
   constructor(
-    private readonly registerUserController: RegisterUserController,
-    private readonly getProfileController: GetProfileController,
+    private readonly _registerUserController: RegisterUserController,
+    private readonly _getProfileController: GetProfileController,
   ) {}
 
+  @Public()
+  @Post('reader/new')
+  async registerGuest(@Body() data: CreateUserInput, @Res() res: Response) {
+    const httpResponse = await this._registerUserController.handle(data);
+    return res.status(httpResponse.statusCode).json(httpResponse.body);
+  }
+
   @Post('admin/new')
-  async register(@Body() data: CreateUserInput, @Res() res: Response) {
-    const httpResponse = await this.registerUserController.handle(data);
+  async registerAdmin(@Body() data: CreateUserInput, @Res() res: Response) {
+    const httpResponse = await this._registerUserController.handle(data);
     return res.status(httpResponse.statusCode).json(httpResponse.body);
   }
 
   @Get('me')
   @ApiOkResponse({ type: ProfileM })
   async profile(@CurrentUser() user: AuthUserDTO, @Res() res: Response) {
-    const httpResponse = await this.getProfileController.handle(user);
+    const httpResponse = await this._getProfileController.handle(user);
     return res.status(httpResponse.statusCode).json(httpResponse.body);
   }
 }

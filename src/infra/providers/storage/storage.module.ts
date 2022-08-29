@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { Global, Module, Provider } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { TOKENS } from '@shared/constants';
@@ -18,6 +18,7 @@ const storageProvider: Provider = {
   inject: [ConfigService],
 };
 
+@Global()
 @Module({
   imports: [ConfigModule],
   providers: [storageProvider],

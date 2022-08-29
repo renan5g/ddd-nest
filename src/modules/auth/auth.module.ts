@@ -4,6 +4,8 @@ import { PassportModule } from '@nestjs/passport';
 
 import { AccountsModule } from '@modules/accounts/accounts.module';
 
+import { ScansModule } from '@modules/scans/scans.module';
+import { jwtConstants } from '@shared/constants';
 import * as Services from './services';
 import * as Strategies from './strategies';
 import * as UseCases from './usecases';
@@ -13,9 +15,10 @@ const useCases: Provider[] = [...Object.values(UseCases)];
 @Module({
   imports: [
     AccountsModule,
+    ScansModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
     }),
   ],

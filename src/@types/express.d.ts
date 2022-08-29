@@ -2,8 +2,9 @@ declare namespace Express {
   export interface Request {
     user: {
       id: string;
-      username: string;
+      name: string;
       email: string;
+      isScan: boolean;
     };
   }
 }

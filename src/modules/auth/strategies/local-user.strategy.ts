@@ -4,9 +4,15 @@ import { Strategy } from 'passport-local';
 import { ValidateUser } from '../services';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+export class UserLocalStrategy extends PassportStrategy(
+  Strategy,
+  'local.user',
+) {
   constructor(private validateUser: ValidateUser) {
-    super();
+    super({
+      usernameField: 'login',
+      passwordField: 'password',
+    });
   }
 
   async validate(login: string, password: string): Promise<any> {
@@ -22,13 +28,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 
     const user = {
       id: data.id,
-      username: data.username.value,
+      name: data.username.value,
       email: data.email.value,
-      accessToken: data.accessToken,
-      lastLogin: data.lastLogin,
-      isDeleted: data.isDeleted,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
     };
 
     return user;

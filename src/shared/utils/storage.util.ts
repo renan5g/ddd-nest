@@ -1,10 +1,45 @@
+import { avifOptions } from '@config/sharp';
+import { tmpFolder } from '@config/upload';
 import * as AdmZip from 'adm-zip';
 import { Request } from 'express';
-import { stat, unlink } from 'fs/promises';
+import { existsSync, readdirSync } from 'fs';
+import { mkdir, stat, unlink } from 'fs/promises';
 import { extname, join, resolve } from 'path';
+import * as sharp from 'sharp';
 
-import env from '@config/env';
-import { tmpFolder } from '@config/upload';
+export class FileUtil {}
+
+export async function convertFileToAvif(
+  { inputDir, outputDir, filename },
+  config: sharp.AvifOptions,
+) {
+  try {
+    if (!existsSync(`${tmpFolder}/${outputDir}`)) {
+      await mkdir(`${tmpFolder}/${outputDir}`, {
+        recursive: true,
+      });
+    }
+
+    const filePath = join(inputDir, filename);
+    const fileOut = join(
+      `${tmpFolder}/${outputDir}`,
+      `${filename.split('.')[0]}.avif`,
+    );
+
+    await sharp(filePath).toFormat('avif').avif(config).toFile(fileOut);
+
+    try {
+      await stat(filePath);
+    } catch {
+      return;
+    }
+    await unlink(filePath);
+
+    return `${outputDir}/${filename.split('.')[0]}.avif`;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export async function editFileName(
   req: Request,
@@ -17,7 +52,6 @@ export async function editFileName(
     .fill(null)
     .map(() => Math.round(Math.random() * 16).toString(16))
     .join('');
-  console.log(fileExtName);
 
   callback(null, `${name}-${randomName}${fileExtName}`);
 }
@@ -28,17 +62,6 @@ export async function imageFileFilter(
   callback,
 ) {
   if (!file.originalname.match(/\.(jpg|jpeg|png|gif|zip|webp|avif)$/)) {
-    return callback(new Error('Only image files are allowed!'), false);
-  }
-  callback(null, true);
-}
-
-export async function pdfFilter(
-  req: Request,
-  file: Express.Multer.File,
-  callback,
-) {
-  if (!file.originalname.match(/\.(pdf)$/)) {
     return callback(new Error('Only image files are allowed!'), false);
   }
   callback(null, true);
@@ -55,26 +78,57 @@ export async function extractArchive(
     const outputDir = join(`${tmpFolder}/${folder}`);
     zip.extractAllTo(outputDir);
 
+    const files = readdirSync(outputDir);
+
+    const filePromises = files.map((file) =>
+      convertFileToAvif(
+        {
+          filename: file,
+          inputDir: outputDir,
+          outputDir: `${folder}`,
+        },
+        avifOptions,
+      ),
+    );
+
+    const filesCompressed = await Promise.all(filePromises);
+
     try {
       await stat(`${tmpFolder}/${file}`);
     } catch {
       return;
     }
     await unlink(`${tmpFolder}/${file}`);
+
+    return filesCompressed;
   } catch (err) {
     console.log(err);
   }
 }
 
-export function getStoredFileURL(file: string): string {
+export function getStorageFileURL(file: string) {
   if (!file) return null;
 
-  switch (env().storage.disk) {
+  switch (process.env.STORAGE_DISK) {
     case 'local':
-      return `${env().storage.server_url}/${file}`;
+      return `${process.env.APP_API_URL}/${file}`;
     case 's3':
-      return `${env().aws.bucket_url}/${file}`;
+      return `${process.env.AWS_BUCKET_URL}/${file}`;
     default:
       return null;
+  }
+}
+
+export async function rollbackFilesUpload(...files: string[]) {
+  for (const file of files) {
+    if (!file) return;
+    const filename = join(tmpFolder, file);
+
+    try {
+      await stat(filename);
+    } catch {
+      return;
+    }
+    await unlink(filename);
   }
 }

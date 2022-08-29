@@ -1,1 +1,1 @@
-export * from './paginated.dto';
+export * from './search-params.dto';

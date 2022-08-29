@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -108,9 +109,10 @@ model ChapterPage {
 model Scan {
   id          String      @id
   name        String      @unique
+  slug        String      @unique
   email       String      @unique
   password    String
-  url         String?
+  link        String?
   cover       String?
   description String?
   website     String?

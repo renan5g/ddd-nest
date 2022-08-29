@@ -1,33 +1,35 @@
 version: '3.9'
 services:
+  # nix-api:
+  #   container_name: nix-api
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 3333:3333
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - .env
+
   postgres:
     image: postgres:latest
-    container_name: database_qrcard_api
+    container_name: nix_database
     restart: always
     ports:
       - 5432:5432
     environment:
       - POSTGRESQL_USERNAME=docker
       - POSTGRES_PASSWORD=docker
-      - POSTGRES_DB=auth-db
+      - POSTGRES_DB=nix_database
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
       - qrcard-api-net
-
-  # redis:
-  #   image: redis:alpine
-  #   ports:
-  #     - 6379:6379
-  #   environment:
-  #     - ALLOW_EMPTY_PASSWORD=true
-  #   networks:
-  #     - qrcard-api-net
-
 
 networks:
   qrcard-api-net:
     driver: bridge
 volumes:
   postgres:
-    name: auth-db
+    name: nix_database

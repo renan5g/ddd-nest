@@ -9,8 +9,11 @@ import {
 } from '@nestjs/swagger';
 
 import { LoginInput, TokenM } from '@infra/docs/models';
-import { LocalAuthGuard } from '@infra/http/guards';
-import { AuthenticateUserController } from '@modules/auth/usecases';
+import { LocalScanAuthGuard, LocalUserAuthGuard } from '@infra/http/guards';
+import {
+  AuthenticateScanController,
+  AuthenticateUserController,
+} from '@modules/auth/usecases';
 
 @ApiTags('Auth')
 @ApiExtraModels(LoginInput, TokenM)
@@ -20,15 +23,38 @@ import { AuthenticateUserController } from '@modules/auth/usecases';
 })
 export class AuthRoutes {
   constructor(
-    private readonly authenticateUserController: AuthenticateUserController,
+    private readonly _authenticateUserController: AuthenticateUserController,
+    private readonly _authenticateScanController: AuthenticateScanController,
   ) {}
 
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(UserLocalAuthGuard)
+  // @ApiBody({ type: LoginInput })
+  // @ApiOkResponse({ type: TokenM })
+  // @Post('admin_session/new')
+  // async loginAdmin(@Req() req: Request, @Res() res: Response) {
+  //   const httpResponse = await this.authenticateUserController.handle(req.user);
+  //   return res.status(httpResponse.statusCode).json(httpResponse.body);
+  // }
+
+  @UseGuards(LocalUserAuthGuard)
   @ApiBody({ type: LoginInput })
   @ApiOkResponse({ type: TokenM })
-  @Post('/admin_session/new')
-  async login(@Req() req: Request, @Res() res: Response) {
-    const httpResponse = await this.authenticateUserController.handle(req.user);
+  @Post('reader_session/new')
+  async loginReader(@Req() req: Request, @Res() res: Response) {
+    const httpResponse = await this._authenticateUserController.handle(
+      req.user,
+    );
+    return res.status(httpResponse.statusCode).json(httpResponse.body);
+  }
+
+  @UseGuards(LocalScanAuthGuard)
+  @ApiBody({ type: LoginInput })
+  @ApiOkResponse({ type: TokenM })
+  @Post('scan_session/new')
+  async loginScan(@Req() req: Request, @Res() res: Response) {
+    const httpResponse = await this._authenticateScanController.handle(
+      req.user,
+    );
     return res.status(httpResponse.statusCode).json(httpResponse.body);
   }
 }

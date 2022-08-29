@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -17,6 +17,7 @@ async function bootstrap() {
   const APP_ROUTE_PREFIX = 'api';
 
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app
     .enableVersioning({

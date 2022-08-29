@@ -15,19 +15,23 @@ export class AuthenticateUser {
 
   async execute({
     userID,
-    username,
+    name,
     email,
   }: AuthenticateUser.Input): Promise<AuthenticateUser.Output> {
     const user = await this.usersRepository.findByEmailOrUsername({
       email,
-      username,
+      username: name,
     });
 
     if (!user) {
       return left(new UserNotFoundError());
     }
 
-    const payload = { sub: userID, username, email };
+    const payload = {
+      sub: userID,
+      name: user.username.value,
+      email: user.email.value,
+    };
 
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -42,7 +46,7 @@ export class AuthenticateUser {
 export namespace AuthenticateUser {
   export type Input = {
     userID: string;
-    username: string;
+    name: string;
     email: string;
   };
 

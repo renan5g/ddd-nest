@@ -7,16 +7,16 @@ const environments = {
     port: parseInt(process.env.PORT, 10) || 3333,
   },
   storage: {
-    disk: process.env.STORAGE_DISK,
-    server_url: process.env.APP_URL,
+    disk: process.env.STORAGE_DISK || 'local',
+    server_url: process.env.APP_URL || 'http://localhost:5050',
   },
   aws: {
-    bucket: process.env.AWS_PUBLIC_BUCKET_NAME ?? 'nix-mangas',
-    bucket_region: process.env.AWS_BUCKET_REGION ?? 'us-east-1',
+    bucket: process.env.AWS_PUBLIC_BUCKET_NAME || 'nix-mangas',
+    bucket_region: process.env.AWS_BUCKET_REGION || 'us-east-1',
     bucket_url: process.env.AWS_BUCKET_URL,
   },
   auth: {
-    jwt_secret: process.env.JWT_SECRET ?? randomUUID(),
+    jwt_secret: process.env.JWT_SECRET || randomUUID(),
   },
 };
 

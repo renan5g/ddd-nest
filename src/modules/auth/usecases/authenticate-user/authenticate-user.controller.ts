@@ -19,13 +19,15 @@ export class AuthenticateUserController implements Controller {
   async handle({
     email,
     id,
-    username,
+    name,
   }: AuthenticateUserController.Request): Promise<HttpResponse> {
     try {
+      console.log('AuthenticateUserController.handle');
+
       const result = await this.authenticateUser.execute({
         userID: id,
         email,
-        username,
+        name,
       });
 
       if (result.isLeft()) {
@@ -53,7 +55,7 @@ export class AuthenticateUserController implements Controller {
 export namespace AuthenticateUserController {
   export type Request = {
     id: string;
-    username: string;
+    name: string;
     email: string;
   };
 }
